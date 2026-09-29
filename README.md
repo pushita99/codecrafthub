@@ -1,124 +1,121 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# CodeCraftHub
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+CodeCraftHub is a small REST API for tracking courses you want to learn. It uses Node.js, Express, and a local JSON file, so no database or user account is needed.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Features
 
-## Description
+- Create, list, view, update, and delete courses
+- Automatically generated numeric IDs and creation timestamps
+- Input validation for required fields, dates, and course statuses
+- Persistent storage in `courses.json`, created automatically on first use
+- JSON error responses for invalid requests, missing courses, and storage failures
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Project structure
 
-## Project setup
-
-```bash
-$ npm install
+```text
+codecrafthub/
+├── app.js          # Express application and API routes
+├── courses.json    # Course data (created automatically)
+├── package.json    # Project metadata and dependencies
+└── README.md       # Project documentation
 ```
 
-## Compile and run the project
+## Installation
+
+Install [Node.js](https://nodejs.org/) and then install the project dependencies:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm install
 ```
 
-## Run tests
+## Run the application
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm start
 ```
 
-## Deployment
+The API listens on `http://localhost:5000`. The `courses.json` file is created the first time an API request needs to read the course list.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## Course fields
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Each course has the following shape:
+
+```json
+{
+  "id": 1,
+  "name": "Python Basics",
+  "description": "Learn Python fundamentals",
+  "target_date": "2026-12-31",
+  "status": "Not Started",
+  "created_at": "2026-09-29T09:12:00.000Z"
+}
+```
+
+When creating a course, provide `name`, `description`, `target_date`, and `status`. The target date must be a real calendar date in `YYYY-MM-DD` format. Status must be `Not Started`, `In Progress`, or `Completed`. The API generates `id` and `created_at`.
+
+## API endpoints
+
+All responses use JSON. Successful responses include `"success": true`; validation and server errors include `"success": false`.
+
+### Create a course
+
+`POST /api/courses`
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+curl -X POST http://localhost:5000/api/courses \
+  -H "Content-Type: application/json" \
+  -d "{\"name\":\"Python Basics\",\"description\":\"Learn Python fundamentals\",\"target_date\":\"2026-12-31\",\"status\":\"Not Started\"}"
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+Returns `201 Created` and the new course.
 
-## Observability
+### Get all courses
 
-In production applications, observability is essential for understanding how your system behaves, detecting issues early, and maintaining reliable performance.
-
-[NestJS Observe](https://observe.nestjs.com) automatically instruments your NestJS application, giving you deep visibility into your system with minimal setup:
-
-- **Distributed tracing:** Follow requests across services and understand how they flow through your system.
-- **Waterfall analysis:** Visualize request execution and identify slow operations, bottlenecks, and unexpected delays.
-- **Performance analysis:** Analyze application performance in real time and quickly pinpoint areas that need optimization.
-- **Metrics:** Track key application and infrastructure metrics to understand system health and performance trends.
-- **Logging:** Centralize and correlate logs with traces and other telemetry to make debugging easier.
-- **Error tracking:** Detect errors quickly and investigate their root causes with the surrounding context.
-- **SLA monitoring:** Track service-level objectives and identify when your application is approaching or exceeding defined thresholds.
-- **Alarms and alerts:** Set up alerts for critical errors, performance degradation, SLA violations, and other anomalies so your team can react quickly.
-
-To add it to this project:
+`GET /api/courses`
 
 ```bash
-$ npm install @nestjs/observe
+curl http://localhost:5000/api/courses
 ```
 
-Then follow the [setup guide](https://docs.nestjs.com/observability/overview) - it takes a single import and an app key.
+Returns `200 OK` with a `count` and a `courses` array.
 
-The free plan needs no payment details and covers 300,000 events a month. You can also browse the [live demo](https://www.observe-demo.nestjs.com/dashboard) first - the whole dashboard over a busy service's data, with nothing to install.
+### Get one course
 
-## Resources
+`GET /api/courses/:id`
 
-Check out a few resources that may come in handy when working with NestJS:
+```bash
+curl http://localhost:5000/api/courses/1
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Auto-instrument your application with [NestJS Observe](https://observe.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+Returns `200 OK`, or `404 Not Found` if the course does not exist.
 
-## Support
+### Update a course
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+`PUT /api/courses/:id`
 
-## Stay in touch
+Send one or more editable fields. Fields not included stay unchanged; the course ID and creation time cannot be changed.
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```bash
+curl -X PUT http://localhost:5000/api/courses/1 \
+  -H "Content-Type: application/json" \
+  -d "{\"status\":\"In Progress\"}"
+```
 
-## License
+Returns `200 OK`, or `404 Not Found` if the course does not exist.
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+### Delete a course
+
+`DELETE /api/courses/:id`
+
+```bash
+curl -X DELETE http://localhost:5000/api/courses/1
+```
+
+Returns `200 OK` and the deleted course, or `404 Not Found` if it does not exist.
+
+## Troubleshooting
+
+- **`Cannot find module 'express'`**: run `npm install`.
+- **Port 5000 is already in use**: stop the other process using the port before starting CodeCraftHub.
+- **Course data cannot be read or saved**: check that the project directory is writable and that `courses.json` contains valid JSON (a JSON array of courses).
+- **`400 Bad Request`**: check that the JSON body is valid and that required fields, date format, and status values meet the rules above.
