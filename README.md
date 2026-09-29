@@ -15,6 +15,7 @@ CodeCraftHub is a small REST API for tracking courses you want to learn. It uses
 ```text
 codecrafthub/
 ├── app.js          # Express application and API routes
+├── index.html      # Learning dashboard (open with Live Server)
 ├── courses.json    # Course data (created automatically)
 ├── package.json    # Project metadata and dependencies
 └── README.md       # Project documentation
@@ -35,6 +36,12 @@ npm start
 ```
 
 The API listens on `http://localhost:5000`. The `courses.json` file is created the first time an API request needs to read the course list.
+
+## Run the dashboard with Live Server
+
+Open `index.html` with Live Server and use port `5500`. Keeping the filename `index.html` matters: when the course lab opens the application root (`/`), the static server loads this default page. The dashboard connects to the API on port `5000`; it automatically uses the forwarded port-5000 host in the course lab and `localhost:5000` when running locally. The API allows requests from Live Server on port `5500`.
+
+If the lab shows a blank page with only `~/`, check that the file is named `index.html`, that Live Server started on port `5500`, and that the Launch Application page is set to port `5500`. The dashboard can render without courses; when the API is unavailable it shows a connection error in the course list.
 
 ## Course fields
 

@@ -8,6 +8,39 @@ const PORT = 5000;
 const VALID_STATUSES = ['Not Started', 'In Progress', 'Completed'];
 const REQUIRED_FIELDS = ['name', 'description', 'target_date', 'status'];
 
+// Allow the local Live Server and the course lab's forwarded 5500 origin.
+app.use((req, res, next) => {
+  const origin = req.get('Origin');
+
+  if (origin) {
+    let parsedOrigin;
+    try {
+      parsedOrigin = new URL(origin);
+    } catch {
+      return res.status(403).json({ success: false, error: 'Request origin is not allowed.' });
+    }
+
+    const isLocalLiveServer =
+      ['localhost', '127.0.0.1'].includes(parsedOrigin.hostname) && parsedOrigin.port === '5500';
+    const isCourseLabLiveServer = /-5500(?:\.|$)/.test(parsedOrigin.hostname);
+
+    if (!isLocalLiveServer && !isCourseLabLiveServer) {
+      return res.status(403).json({ success: false, error: 'Request origin is not allowed.' });
+    }
+
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  }
+
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(204);
+  }
+
+  return next();
+});
+
 app.use(express.json());
 
 // Give storage errors a safe, useful message without exposing local file paths.
